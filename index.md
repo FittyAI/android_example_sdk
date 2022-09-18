@@ -6,42 +6,29 @@ description: "Just the Docs is a responsive Jekyll theme with built-in search th
 permalink: /
 ---
 
-# Focus on writing good documentation.
+# FittyAI
 
 {: .fs-9 }
 
-Just the Docs gives your documentation a jumpstart with a responsive Jekyll theme that is easily customizable and hosted on GitHub Pages.
+Release candidate for FittyAI Camera integration
+
 {: .fs-6 .fw-300 }
 
-[Get started now](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/just-the-docs/just-the-docs){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Get started now](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Example source code on GitHub](https://github.com/just-the-docs/just-the-docs){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
 {: .new }
 
-> **Pre-release version `0.4.0.rc2` is available!**
-> See [the CHANGELOG](https://github.com/just-the-docs/just-the-docs/blob/main/CHANGELOG.md) for a detailed breakdown.
-
-{: .warning }
-
-> Specifying `gem "just-the-docs"` in your `Gemfile` uses the latest **_release_** (`v0.3.3`), ignoring all pre-releases!
-> To use this pre-release, pin it:
->
-> ```ruby
-> gem "just-the-docs", "0.4.0.rc2"
-> ```
->
-> and/or
->
-> ```yaml
-> remote_theme: just-the-docs/just-the-docs@v0.4.0.rc2
-> ```
+> **Pre-release version `0.0.2.rc1` is available!**
 
 ## Getting started
 
-### Dependencies
+### Basic knowledge
 
-Just the Docs is built for [Jekyll](https://jekyllrb.com), a static site generator. View the [Jekyll quick start guide](https://jekyllrb.com/docs/) for more information. Just the Docs requires no special plugins and can run on GitHub Pages' standard Jekyll compiler. The [Jekyll SEO Tag plugin](https://github.com/jekyll/jekyll-seo-tag) is included by default (no need to run any special installation) to inject SEO and open graph metadata on docs pages. For information on how to configure SEO and open graph metadata visit the [Jekyll SEO Tag usage guide](https://jekyll.github.io/jekyll-seo-tag/usage/).
+FittyAI Camera is build on react framework. The initial plan is to support iframe embedding for web applications and webview in android applications. [Android application integration could be found here](https://github.com/FittyAI/android_example_sdk)
+
+
 
 ### Quick start: Use as a GitHub Pages remote theme
 
