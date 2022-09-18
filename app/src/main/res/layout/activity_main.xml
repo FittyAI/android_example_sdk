@@ -16,14 +16,14 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="1px"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/Theme.MyApplication.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <WebView
-        android:id="@+id/webview"
+        android:id="@+id/fittyCamera"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

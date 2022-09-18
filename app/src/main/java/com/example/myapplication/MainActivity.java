@@ -45,12 +45,34 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-    private WebView webView;
-    private WebSocketClient mWebSocketClient;
-    private static final int MY_CAMERA_REQUEST_CODE = 100;
+    private WebView fittyCamera;
+    private WebSocketClient wsClient;
+    private static final int CAMERA_REQUEST_CODE = 200;
 
-    @SuppressLint("SetJavaScriptEnabled")
-    public static void configureWebView(WebView webView) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        final String companyName = "fitty";
+        final String sessionGUID = java.util.UUID.randomUUID().toString();
+
+        connectFittyWebsocket(sessionGUID);
+        EasyPermissions.requestPermissions(
+                this,
+                "This application needs camera access.",
+                CAMERA_REQUEST_CODE,
+                Manifest.permission.CAMERA);
+
+        if(ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED) {
+            fittyCamera = (WebView) findViewById(R.id.fittyCamera);
+            fittyCamera.loadUrl(String.format("https://demost.fittyai.com/mirror/%s/fitty-camera/%s", companyName, sessionGUID));
+            configureWebView(fittyCamera);
+        }
+
+    }
+
+    public static WebView configureWebView(WebView webView) {
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
@@ -58,52 +80,11 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setMediaPlaybackRequiresUserGesture(false);
         CookieManager.getInstance().setAcceptCookie(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        setSupportActionBar(binding.toolbar);
-
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        final String sessionGUID = java.util.UUID.randomUUID().toString();
-
-        connectWebSocket(sessionGUID);
-
-        EasyPermissions.requestPermissions(
-                this,
-                "A partir deste ponto a permissão de câmera é necessária.",
-                200,
-                Manifest.permission.CAMERA);
-
-        if(ContextCompat.checkSelfPermission(getApplicationContext(),Manifest.permission.CAMERA)==PackageManager.PERMISSION_GRANTED) {
-            webView = (WebView) findViewById(R.id.webview);
-            webView.loadUrl(String.format("https://docs-example.d6x4yzgo302vn.amplifyapp.com/mirror/%s/fitty-camera/%s", "fittar", sessionGUID));
-            configureWebView(webView);
-            webView.setWebViewClient(new WebViewClient());
-            WebChromeClientCustomPoster chromeClient = new WebChromeClientCustomPoster();
-            webView.setWebChromeClient(chromeClient);
-            WebView.setWebContentsDebuggingEnabled(true);
-            Log.d("myTag", "It's not done mate");
-        }
-        Log.d("myTag", "It's done mate");
-
+        webView.setWebViewClient(new WebViewClient());
+        WebChromeClientCustomPoster chromeClient = new WebChromeClientCustomPoster();
+        webView.setWebChromeClient(chromeClient);
+        webView.setWebContentsDebuggingEnabled(true);
+        return webView;
     }
 
     @Override
@@ -135,8 +116,19 @@ public class MainActivity extends AppCompatActivity {
                 || super.onSupportNavigateUp();
     }
 
-    private void connectWebSocket(String sessionGUID) {
+    private void connectFittyWebsocket(String sessionGUID) {
         URI uri;
+        String sessionInitialisationEvent = "{" +
+                "    \"company_identifier\": \"fitty\"," +
+                "    \"session_id\": \"%s\"," +
+                "    \"event_type\": \"session_start\"," +
+                "    \"user_bio_information\": {" +
+                "        \"height\": 184," +
+                "        \"weight\": 77," +
+                "        \"gender\": 0" +
+                "    }," +
+                "    \"timestamp\": \"2022-03-01 12:32:12\"" +
+                "}";
         try {
             uri = new URI("wss://backenddev.fittyai.com:443");
         } catch (URISyntaxException e) {
@@ -144,22 +136,11 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        mWebSocketClient = new WebSocketClient(uri) {
+        wsClient = new WebSocketClient(uri) {
             @Override
             public void onOpen(ServerHandshake serverHandshake) {
                 Log.i("Websocket", "Opened");
-
-                mWebSocketClient.send(String.format("{\n" +
-                        "    \"company_identifier\": \"fitty\",\n" +
-                        "    \"session_id\": \"%s\",\n" +
-                        "    \"event_type\": \"session_start\",\n" +
-                        "    \"user_bio_information\": {\n" +
-                        "        \"height\": 184,\n" +
-                        "        \"weight\": 77,\n" +
-                        "        \"gender\": 0\n" +
-                        "    },\n" +
-                        "    \"timestamp\": \"2022-03-01 12:32:12\"\n" +
-                        "}", sessionGUID));
+                wsClient.send(String.format(sessionInitialisationEvent, sessionGUID));
             }
 
             @Override
@@ -184,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Websocket", "Error " + e.getMessage());
             }
         };
-        mWebSocketClient.connect();
+        wsClient.connect();
     }
 }
 
